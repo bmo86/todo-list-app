@@ -38,7 +38,7 @@ func (i *instacePostgres) GetUsrById(id uint) (*modelsusr.GetUsr_ID, error) {
 func (i *instacePostgres) GetUsrByEmail(email string) (*modelsusr.GetUsr_Email, error) {
 
 	var usr modelsusr.GetUsr_Email
-	err := i.db.Table("users").Select("id, name, lastname, position, pass").Where("email = ?", email).Scan(&usr)
+	err := i.db.Table("users").Select("id, position, pass").Where("email = ?", email).Scan(&usr)
 	if err.Error != nil {
 		return nil, err.Error
 	}

@@ -32,20 +32,11 @@ type GetUsr_ID struct {
 
 type GetUsr_Email struct {
 	ID       uint   `json:"id"`
-	Name     string `json:"name"`
-	Lastname string `json:"lastname"`
+	Pass     string `json:"pass"`
 	Position bool   `json:"position"` //admin or not, true - admin, false - not
 }
 
 type Login_Request struct {
 	Email string `json:"email"`
 	Pass  string `json:"pass"`
-}
-
-type Login_Response struct {
-	ID            int    `json:"id"`
-	Name_Lastname string `json:"name_complete"`
-	Email         string `json:"email"`
-	Pass          string `json:"pass"`
-	Token         string `json:"token"`
 }
