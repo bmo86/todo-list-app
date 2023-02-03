@@ -8,7 +8,7 @@ import (
 )
 
 func (i *instacePostgres) SingUp(usr *modelsusr.SingUp_Request) (uint, error) {
-	u := modelsusr.Usr{
+	u := modelsusr.User{
 		Model: gorm.Model{
 			CreatedAt: time.Now().UTC(),
 			UpdatedAt: time.Now().UTC(),
@@ -18,7 +18,7 @@ func (i *instacePostgres) SingUp(usr *modelsusr.SingUp_Request) (uint, error) {
 		Email:    usr.Email,
 		Pass:     usr.Pass,
 		Position: usr.Position,
-		Status:   true,
+		Status:   usr.Status,
 	}
 
 	data := i.db.Create(&u)

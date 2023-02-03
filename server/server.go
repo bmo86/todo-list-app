@@ -52,14 +52,14 @@ func NewServer(config *Config) (*Broker, error) {
 
 	return &Broker{
 		config: config,
-		router: gin.Default(),
+		router: gin.New(),
 		hub:    websocket.NewHub(),
 	}, nil
 
 }
 
 func (b *Broker) Strat(binder func(s Server, r *gin.Engine)) {
-	b.router = gin.Default()
+	b.router = gin.New()
 	binder(b, b.router)
 
 	handler := cors.Default().Handler(b.router)

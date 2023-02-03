@@ -24,6 +24,12 @@ func msgError(msg interface{}) gin.H {
 	}
 }
 
+func HandlerWs(s server.Server) gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		s.Hub().HandlerWs(ctx.Writer, ctx.Request)
+	}
+}
+
 func HandlerSingUp(s server.Server) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		req := modelsusr.SingUp_Request{}
@@ -51,6 +57,7 @@ func HandlerSingUp(s server.Server) gin.HandlerFunc {
 
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, msgError(err))
+			return
 		}
 
 		ctx.JSON(http.StatusCreated, gin.H{

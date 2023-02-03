@@ -10,5 +10,5 @@ CREATE TABLE users(
     deleted_at timestamp,
     status BOOLEAN NOT NULL,
     pass VARCHAR(255) NOT NULL,
-    position VARCHAR(255) NOT NULL
+    position BOOLEAN NOT NULL
 );
