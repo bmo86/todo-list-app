@@ -1,0 +1,21 @@
+data - todo list
+
+-usr_id
+-check sure or complete task
+-Name task
+-date creation
+-date finish
+-status
+-image
+
+
+js manda base64 y en golang se decodifica la base64 a Binarios y con go mando a guardar los binarios a la DB como dato blob.
+
+
+endpoints
+
+-Create
+-Delete
+-Update
+-GetTasks
+-GetTask
