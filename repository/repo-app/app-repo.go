@@ -6,7 +6,7 @@ type App interface {
 	CreateTask(task *modelsapp.Task) (uint, error)
 	DeleteTask(id uint) error
 	UpdateTask(id uint, task *modelsapp.Task) (uint, error)
-	GetTasks() ([]*modelsapp.Task, error)
+	GetTasks(page int) ([]*modelsapp.Task, error)
 	GetTask(id uint) (*modelsapp.Task, error)
 }
 
@@ -28,8 +28,8 @@ func UpdateTask(id uint, task *modelsapp.Task) (uint, error) {
 	return repo.UpdateTask(id, task)
 }
 
-func GetTasks() ([]*modelsapp.Task, error) {
-	return repo.GetTasks()
+func GetTasks(page int) ([]*modelsapp.Task, error) {
+	return repo.GetTasks(page)
 }
 
 func GetTask(id uint) (*modelsapp.Task, error) {
