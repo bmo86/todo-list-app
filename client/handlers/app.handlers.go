@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/base64"
 	"net/http"
+	"strconv"
 	"time"
 	"todo-api/config"
 	modelsapp "todo-api/models/models-app"
@@ -49,7 +50,7 @@ func HandlerCreateTask(s server.Server) gin.HandlerFunc {
 				Check:       req.Check,
 				Status:      req.Status,
 				DateFinish:  req.DateFinish,
-				Image:       string(image),
+				Image:       image,
 			}
 
 			idRes, err := repoapp.CreateTask(&taskSend)
@@ -61,12 +62,168 @@ func HandlerCreateTask(s server.Server) gin.HandlerFunc {
 			s.Hub().BroadCast(taskSend, nil)
 
 			c.JSON(http.StatusCreated, gin.H{
-				"id_create_task": idRes,
-				"message":        "create Task",
+				"id":      idRes,
+				"message": "create Task",
 			})
 		} else {
 			c.JSON(http.StatusInternalServerError, msgError(err))
 		}
 
+	}
+}
+
+func HandlerDeleteTask(s server.Server) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token, err := config.Token(s, c.Writer, c.Request)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, msgError(err))
+			return
+		}
+
+		if _, ok := token.Claims.(*modelstoken.AppClaims); ok && token.Valid {
+			idReq := c.Param("id")
+			if idReq == "" {
+				c.JSON(http.StatusBadRequest, msgError("Not Found id"))
+				return
+			}
+
+			id, err := strconv.ParseInt(idReq, 10, 64)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, msgError(err))
+				return
+			}
+
+			if err = repoapp.DeleteTask(uint(id)); err != nil {
+				c.JSON(http.StatusInternalServerError, msgError(err))
+				return
+			}
+
+		} else {
+			c.JSON(http.StatusInternalServerError, msgError(err))
+			return
+		}
+
+	}
+}
+
+func HandlerUpdateTask(s server.Server) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token, err := config.Token(s, c.Writer, c.Request)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, msgError(err))
+			return
+		}
+
+		if _, ok := token.Claims.(*modelstoken.AppClaims); ok && token.Valid {
+			idReq := c.Param("id")
+
+			if idReq == "" {
+				c.JSON(http.StatusBadRequest, msgError("Not Found id"))
+				return
+			}
+
+			id, err := strconv.ParseInt(idReq, 10, 64)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, msgError(err))
+				return
+			}
+
+			var reqData modelsapp.Task
+
+			if err = c.ShouldBind(&reqData); err != nil {
+				c.JSON(http.StatusBadRequest, msgError(err))
+				return
+			}
+
+			taskRes := modelsapp.Task{
+				Title:       reqData.Title,
+				Description: reqData.Description,
+				Image:       reqData.Image,
+				Check:       reqData.Check,
+				Model:       gorm.Model{UpdatedAt: reqData.UpdatedAt},
+				Status:      reqData.Status,
+			}
+
+			idRes, err := repoapp.UpdateTask(uint(id), &taskRes)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, msgError(err))
+				return
+			}
+
+			c.JSON(http.StatusOK, gin.H{
+				"message": "update task",
+				"id":      idRes,
+			})
+
+		}
+
+	}
+}
+
+func HandlerGetTasks(s server.Server) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token, err := config.Token(s, c.Writer, c.Request)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, msgError(err))
+			return
+		}
+
+		if _, ok := token.Claims.(*modelstoken.AppClaims); ok && token.Valid {
+			pageRes := c.Param("page")
+			if pageRes == "" {
+				pageRes = "1"
+			}
+
+			page, err := strconv.ParseInt(pageRes, 10, 64)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, msgError(err))
+				return
+			}
+
+			res, err := repoapp.GetTasks(int(page))
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, msgError(err))
+				return
+			}
+
+			c.JSON(http.StatusOK, gin.H{"data": res})
+
+		} else {
+			c.JSON(http.StatusInternalServerError, msgError(err))
+		}
+	}
+}
+
+func HandlerGetTask(s server.Server) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token, err := config.Token(s, c.Writer, c.Request)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, msgError(err))
+			return
+		}
+
+		if _, ok := token.Claims.(*modelstoken.AppClaims); ok && token.Valid {
+			idReq := c.Param("id")
+			if idReq == "" {
+				c.JSON(http.StatusBadRequest, msgError("Not Found id"))
+				return
+			}
+
+			id, err := strconv.ParseInt(idReq, 10, 64)
+			if err != nil {
+				c.JSON(http.StatusBadRequest, msgError(err))
+				return
+			}
+
+			res, err := repoapp.GetTask(uint(id))
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, msgError(err))
+				return
+			}
+			c.JSON(http.StatusOK, gin.H{"data": res})
+		} else {
+			c.JSON(http.StatusInternalServerError, msgError(err))
+			return
+		}
 	}
 }

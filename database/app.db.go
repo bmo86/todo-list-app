@@ -22,7 +22,6 @@ func (i *instacePostgres) UpdateTask(id uint, task *modelsapp.Task) (uint, error
 		"title":       task.Title,
 		"description": task.Description,
 		"image":       task.Image,
-		"check":       task.Check,
 		"update_at":   task.UpdatedAt,
 		"status":      task.Status,
 	}

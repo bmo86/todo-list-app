@@ -39,10 +39,19 @@ func BindRoutes(s server.Server, r *gin.Engine) {
 
 	api := r.Group("/api/v1")
 
+	//home
+	r.GET("/home", handlers.HandlerHome())
+	//usr
 	api.Use(middleware.CheckAuthMiddleware(s))
 	r.POST("/singup", handlers.HandlerSingUp(s))
 	r.POST("/login", handlers.HandlerLogin(s))
 	api.GET("/me", handlers.HandlerMe(s))
+	//task
+	api.POST("/task", handlers.HandlerCreateTask(s))
+	api.DELETE("/task/:id", handlers.HandlerDeleteTask(s))
+	api.PATCH("/task/:id", handlers.HandlerUpdateTask(s))
+	api.GET("/task/:id", handlers.HandlerGetTask(s))
+	api.GET("/tasks/:page", handlers.HandlerGetTasks(s))
 	r.GET("/ws", handlers.HandlerWs(s))
 
 }

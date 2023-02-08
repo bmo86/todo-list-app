@@ -12,7 +12,7 @@ type Task struct {
 	Check       bool      `json:"check"`
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
-	Image       string    `json:"image"`
+	Image       []byte    `json:"image"`
 	DateFinish  time.Time `json:"date_finish"`
 	Status      bool      `json:"status"`
 }
