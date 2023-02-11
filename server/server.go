@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"todo-api/database"
+	repoapp "todo-api/repository/repo-app"
 	repousr "todo-api/repository/repo-usr"
 	"todo-api/websocket"
 
@@ -72,6 +73,7 @@ func (b *Broker) Strat(binder func(s Server, r *gin.Engine)) {
 	go b.Hub().Run()
 
 	repousr.SetRepo(repo)
+	repoapp.SetRepoApp(repo)
 
 	log.Println("Loading Server on port ", b.config.PORT)
 	if err := http.ListenAndServe(b.config.PORT, handler); err != nil {

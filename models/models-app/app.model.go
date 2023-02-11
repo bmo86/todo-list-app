@@ -9,7 +9,6 @@ import (
 type Task struct {
 	gorm.Model
 	User_id     uint      `json:"usr_id"`
-	Check       bool      `json:"check"`
 	Title       string    `json:"title"`
 	Description string    `json:"description"`
 	Image       []byte    `json:"image"`

@@ -47,7 +47,6 @@ func HandlerCreateTask(s server.Server) gin.HandlerFunc {
 				User_id:     claims.IdUser,
 				Title:       req.Title,
 				Description: req.Description,
-				Check:       req.Check,
 				Status:      req.Status,
 				DateFinish:  req.DateFinish,
 				Image:       image,
@@ -98,6 +97,10 @@ func HandlerDeleteTask(s server.Server) gin.HandlerFunc {
 				return
 			}
 
+			c.JSON(http.StatusOK, gin.H{
+				"message": "Delete Taks",
+			})
+
 		} else {
 			c.JSON(http.StatusInternalServerError, msgError(err))
 			return
@@ -139,7 +142,6 @@ func HandlerUpdateTask(s server.Server) gin.HandlerFunc {
 				Title:       reqData.Title,
 				Description: reqData.Description,
 				Image:       reqData.Image,
-				Check:       reqData.Check,
 				Model:       gorm.Model{UpdatedAt: reqData.UpdatedAt},
 				Status:      reqData.Status,
 			}
