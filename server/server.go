@@ -4,8 +4,10 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"todo-api/cache"
 	"todo-api/database"
 	repoapp "todo-api/repository/repo-app"
+	repocache "todo-api/repository/repo-cache"
 	repousr "todo-api/repository/repo-usr"
 	"todo-api/websocket"
 
@@ -17,6 +19,7 @@ type Config struct {
 	PORT       string
 	JWT_SECRET string
 	DATABASE   string
+	REDIS_URL  string
 }
 
 type Server interface {
@@ -51,6 +54,10 @@ func NewServer(config *Config) (*Broker, error) {
 		return nil, errors.New("JWT is required")
 	}
 
+	if config.REDIS_URL == "" {
+		return nil, errors.New("REDIS id required")
+	}
+
 	return &Broker{
 		config: config,
 		router: gin.New(),
@@ -69,6 +76,9 @@ func (b *Broker) Strat(binder func(s Server, r *gin.Engine)) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	rdb := cache.NewRedis(b.config.REDIS_URL)
+	repocache.SetRepo(rdb)
 
 	go b.Hub().Run()
 

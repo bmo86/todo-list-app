@@ -7,8 +7,10 @@ import (
 	"time"
 	"todo-api/config"
 	modelsapp "todo-api/models/models-app"
+	modelscache "todo-api/models/models-cache"
 	modelstoken "todo-api/models/models-token"
 	repoapp "todo-api/repository/repo-app"
+	repocache "todo-api/repository/repo-cache"
 	"todo-api/server"
 
 	"github.com/gin-gonic/gin"
@@ -176,19 +178,12 @@ func HandlerGetTasks(s server.Server) gin.HandlerFunc {
 				pageRes = "1"
 			}
 
-			page, err := strconv.ParseInt(pageRes, 10, 64)
-			if err != nil {
-				c.JSON(http.StatusBadRequest, msgError(err))
-				return
-			}
-
-			res, err := repoapp.GetTasks(int(page))
+			res, cacheHit, err := repocache.GetDataTasks(c.Request.Context(), pageRes)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, msgError(err))
 				return
 			}
-
-			c.JSON(http.StatusOK, gin.H{"data": res})
+			c.JSON(http.StatusOK, modelscache.CacheResponse{Cache: cacheHit, Data: res})
 
 		} else {
 			c.JSON(http.StatusInternalServerError, msgError(err))
@@ -211,18 +206,12 @@ func HandlerGetTask(s server.Server) gin.HandlerFunc {
 				return
 			}
 
-			id, err := strconv.ParseInt(idReq, 10, 64)
-			if err != nil {
-				c.JSON(http.StatusBadRequest, msgError(err))
-				return
-			}
-
-			res, err := repoapp.GetTask(uint(id))
+			res, cacheHit, err := repocache.GetDataTask(idReq)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, msgError(err))
 				return
 			}
-			c.JSON(http.StatusOK, gin.H{"data": res})
+			c.JSON(http.StatusOK, modelscache.CacheResponseOnlyOne{Cache: cacheHit, Data: res})
 		} else {
 			c.JSON(http.StatusInternalServerError, msgError(err))
 			return

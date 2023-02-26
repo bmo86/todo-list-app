@@ -21,10 +21,13 @@ func main() {
 	PORT := os.Getenv("PORT")
 	JWT_SECRET := os.Getenv("JWT_SECRET")
 	DATABASE_URL := os.Getenv("DATABASE")
+	REDIS_URL := os.Getenv("REDIS_URL")
+
 	s, err := server.NewServer(&server.Config{
 		PORT:       PORT,
 		JWT_SECRET: JWT_SECRET,
 		DATABASE:   DATABASE_URL,
+		REDIS_URL:  REDIS_URL,
 	})
 
 	if err != nil {
