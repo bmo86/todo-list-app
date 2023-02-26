@@ -34,14 +34,14 @@ func (i *instacePostgres) UpdateTask(id uint, task *modelsapp.Task) (uint, error
 }
 
 func (i *instacePostgres) GetTasks(page int) ([]*modelsapp.Task, error) {
-	limit := page
-	offset := page * 5
+	limit := page * 5
+	offset := page
 
 	var tasks []*modelsapp.Task
-	err := i.db.Offset(offset).Limit(limit).Find(&tasks)
+	err := i.db.Offset(offset).Limit(limit).Find(&tasks).Error
 
-	if err.Error != nil {
-		return nil, err.Error
+	if err != nil {
+		return nil, err
 	}
 
 	return tasks, nil

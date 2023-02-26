@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"strconv"
 	"time"
 	modelsapp "todo-api/models/models-app"
@@ -69,7 +68,7 @@ func (r *NewConn) GetDataTasks(ctx context.Context, query string) ([]*modelsapp.
 
 func (r *NewConn) GetDataTask(query string) (*modelsapp.Task, bool, error) {
 	val, err := r.db.Get(query).Result()
-	log.Println(err)
+
 	if err == redis.Nil {
 		id, err := strconv.Atoi(query)
 		if err != nil {
