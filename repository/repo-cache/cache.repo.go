@@ -3,11 +3,13 @@ package repocache
 import (
 	"context"
 	modelsapp "todo-api/models/models-app"
+	modelsusr "todo-api/models/models-usr"
 )
 
 type Cache interface {
 	GetDataTasks(ctx context.Context, query string) ([]*modelsapp.Task, bool, error)
 	GetDataTask(query string) (*modelsapp.Task, bool, error)
+	GetUser_ID(ctx context.Context, query string) (*modelsusr.GetUsr_ID, bool, error)
 }
 
 var cache Cache
@@ -22,4 +24,8 @@ func GetDataTasks(ctx context.Context, query string) ([]*modelsapp.Task, bool, e
 
 func GetDataTask(query string) (*modelsapp.Task, bool, error) {
 	return cache.GetDataTask(query)
+}
+
+func GetUser_ID(ctx context.Context, query string) (*modelsusr.GetUsr_ID, bool, error) {
+	return cache.GetUser_ID(ctx, query)
 }

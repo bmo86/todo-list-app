@@ -9,7 +9,9 @@ import (
 	"strconv"
 	"time"
 	modelsapp "todo-api/models/models-app"
+	modelsusr "todo-api/models/models-usr"
 	repoapp "todo-api/repository/repo-app"
+	repousr "todo-api/repository/repo-usr"
 
 	"github.com/go-redis/redis"
 )
@@ -27,6 +29,46 @@ func NewRedis(addr string) *NewConn {
 	})
 
 	return &NewConn{rdb}
+}
+
+func (r *NewConn) GetUser_ID(ctx context.Context, query string) (*modelsusr.GetUsr_ID, bool, error) {
+
+	val, err := r.db.Get(query).Result()
+	if err == redis.Nil {
+		//data
+		id, err := strconv.Atoi(query)
+		if err != nil {
+			return nil, false, err
+		}
+
+		res, err := repousr.GetUsrById(uint(id))
+		if err != nil {
+			return nil, false, err
+		}
+
+		b, err := json.Marshal(res)
+		if err != nil {
+			return nil, false, err
+		}
+
+		err = r.db.Set(query, bytes.NewBuffer(b).Bytes(), time.Minute*1).Err()
+		if err != nil {
+			return nil, false, err
+		}
+
+		return res, false, nil
+
+	} else if err != nil {
+		return nil, false, err
+	} else {
+		var data *modelsusr.GetUsr_ID
+		err := json.Unmarshal(bytes.NewBufferString(val).Bytes(), &data)
+		if err != nil {
+			return nil, false, err
+		}
+		return data, true, nil
+	}
+
 }
 
 func (r *NewConn) GetDataTasks(ctx context.Context, query string) ([]*modelsapp.Task, bool, error) {
@@ -48,7 +90,7 @@ func (r *NewConn) GetDataTasks(ctx context.Context, query string) ([]*modelsapp.
 			return nil, false, err
 		}
 
-		err = r.db.Set(query, bytes.NewBuffer(b).Bytes(), time.Hour*3).Err()
+		err = r.db.Set(query, bytes.NewBuffer(b).Bytes(), time.Minute*1).Err()
 		if err != nil {
 			return nil, false, err
 		}

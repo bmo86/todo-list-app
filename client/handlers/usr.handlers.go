@@ -1,11 +1,14 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
+	"strconv"
 	"time"
 	"todo-api/config"
 	modelstoken "todo-api/models/models-token"
 	modelsusr "todo-api/models/models-usr"
+	repocache "todo-api/repository/repo-cache"
 	repousr "todo-api/repository/repo-usr"
 	"todo-api/server"
 
@@ -126,14 +129,14 @@ func HandlerMe(s server.Server) gin.HandlerFunc {
 		}
 
 		if claims, ok := token.Claims.(*modelstoken.AppClaims); ok && token.Valid {
-			usr, err := repousr.GetUsrById(claims.IdUser)
+			usr, hit, err := repocache.GetUser_ID(context.Background(), strconv.Itoa(int(claims.IdUser)))
 			if err != nil {
 				ctx.JSON(http.StatusInternalServerError, msgError(err))
 				return
 			}
 
 			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"data": usr,
+				"cache": hit, "data": usr,
 			})
 			return
 		}
