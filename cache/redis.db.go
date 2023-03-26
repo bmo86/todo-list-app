@@ -71,6 +71,43 @@ func (r *NewConn) GetUser_ID(ctx context.Context, query string) (*modelsusr.GetU
 
 }
 
+func (r *NewConn) GetUser_Email(query string) (*modelsusr.GetUsr_Email, bool, error) {
+	val, err := r.db.Get(query).Result()
+	if err == redis.Nil {
+		res, err := repousr.GetUsrByEmail(query)
+		if err != nil {
+			return nil, false, err
+		}
+
+		b, err := json.Marshal(res)
+		if err != nil {
+			return nil, false, err
+		}
+
+		err = r.db.Set(query, bytes.NewBuffer(b).Bytes(), time.Minute*1).Err()
+		if err != nil {
+			return nil, false, err
+		}
+
+		return res, false, err
+
+	} else if err != nil {
+
+		return nil, false, err
+
+	} else {
+		var data *modelsusr.GetUsr_Email
+		err := json.Unmarshal(bytes.NewBufferString(val).Bytes(), &data)
+		if err != nil {
+			return nil, false, err
+		}
+
+		return data, true, nil
+
+	}
+
+}
+
 func (r *NewConn) GetDataTasks(ctx context.Context, query string) ([]*modelsapp.Task, bool, error) {
 	val, err := r.db.Get(query).Result()
 	if err == redis.Nil {

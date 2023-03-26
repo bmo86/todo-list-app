@@ -80,7 +80,7 @@ func HandlerLogin(s server.Server) gin.HandlerFunc {
 			return
 		}
 
-		usr, err := repousr.GetUsrByEmail(req.Email)
+		usr, _, err := repocache.GetUser_Email(req.Email)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, msgError(err))
 			return
